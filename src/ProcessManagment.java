@@ -40,7 +40,7 @@ public class ProcessManagment extends JFrame {
     public ProcessManagment() {
         setTitle("Process Management");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(800, 700);
+        setSize(900, 700);
         setLayout(null);
 
         JPanel mainPanel = new JPanel(new GridLayout(3, 2, 10, 10));
@@ -86,7 +86,7 @@ public class ProcessManagment extends JFrame {
         deleteButton.setBounds(550, 50, 150, 30);
         resumeButton.setBounds(350, 100, 150, 30);
         blockButton.setBounds(550, 100, 150, 30);
-        backbtn.setBounds(550, 150, 150, 30);
+        backbtn.setBounds(740, 50, 150, 30);
 
         add(createButton);
         add(deleteButton);
@@ -121,24 +121,37 @@ public class ProcessManagment extends JFrame {
         createButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String id = idField.getText();
-                if (id.isBlank()) {
+                String id = idField.getText().trim();
+                if (id.isEmpty()) {
                     Random random = new Random();
                     id = "P" + random.nextInt(1000);
                     idField.setText(id);
+                } else {
+                    boolean idExists = false;
+                    for (int i = 0; i < model.getRowCount(); i++) {
+                        if (id.equals(model.getValueAt(i, 0))) {
+                            idExists = true;
+                            break;
+                        }
+                    }
+                    if (idExists) {
+                        JOptionPane.showMessageDialog(null, "Enter a different ID. This ID already exists.", "Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
                 }
+
                 int arrivalTime = Integer.parseInt(arrivalField.getText());
                 int burstTime = Integer.parseInt(burstField.getText());
-
                 Vector<String> row = new Vector<>();
                 row.add(id);
                 row.add(String.valueOf(arrivalTime));
                 row.add(String.valueOf(burstTime));
-                row.add(String.valueOf("Ready State"));
+                row.add("Ready State");
 
                 model.addRow(row);
             }
         });
+
 
         deleteButton.addActionListener(new ActionListener() {
             @Override

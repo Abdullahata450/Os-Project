@@ -39,7 +39,7 @@ public class Main {
         button1.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-               ProcessManagment M =new ProcessManagment();
+                ProcessManagment M =new ProcessManagment();
                M.reciveData(ID,BT,AT,Status);
 
             }

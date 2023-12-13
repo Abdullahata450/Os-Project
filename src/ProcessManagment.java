@@ -40,7 +40,7 @@ public class ProcessManagment extends JFrame {
     public ProcessManagment() {
         setTitle("Process Management");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(900, 700);
+        setSize(1100, 700);
         setLayout(null);
 
         JPanel mainPanel = new JPanel(new GridLayout(3, 2, 10, 10));
@@ -56,10 +56,12 @@ public class ProcessManagment extends JFrame {
         JTextField burstField = new JTextField();
 
         JButton createButton = new JButton("Create Process");
-        JButton deleteButton = new JButton("Delete Process");
-        JButton resumeButton = new JButton("Resume Process");
+        JButton Destory = new JButton("Destroy Process");
+        JButton Suspend = new JButton("Suspend Process");
         JButton blockButton = new JButton("Block Process");
-        JButton backbtn=new JButton("Back to Menu");
+        JButton resume=new JButton("Resume Process");
+        JButton Wakeup=new JButton("WakeUp Process");
+        JButton Backbtn=new JButton("Go Back");
 
         model = new DefaultTableModel();
         processTable = new JTable(model);
@@ -70,7 +72,7 @@ public class ProcessManagment extends JFrame {
 
 
         JScrollPane scrollPane = new JScrollPane(processTable);
-        scrollPane.setBounds(10, 170, 750, 300);
+        scrollPane.setBounds(110, 170, 750, 300);
 
         mainPanel.add(idLabel);
         mainPanel.add(idField);
@@ -83,18 +85,23 @@ public class ProcessManagment extends JFrame {
         add(scrollPane);
 
         createButton.setBounds(350, 50, 150, 30);
-        deleteButton.setBounds(550, 50, 150, 30);
-        resumeButton.setBounds(350, 100, 150, 30);
+        Destory.setBounds(550, 50, 150, 30);
+        Suspend.setBounds(350, 100, 150, 30);
         blockButton.setBounds(550, 100, 150, 30);
-        backbtn.setBounds(740, 50, 150, 30);
+        resume.setBounds(740, 50, 150, 30);
+        Wakeup.setBounds(740,100,150,30);
+        Backbtn.setBounds(910,100,150,30);
+
 
         add(createButton);
-        add(deleteButton);
-        add(resumeButton);
+        add(Destory);
+        add(Suspend);
         add(blockButton);
-        add(backbtn);
+        add(resume);
+        add(Wakeup);
+        add(Backbtn);
 
-        backbtn.addActionListener(new ActionListener() {
+        Backbtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                Main m=new Main();
@@ -105,7 +112,7 @@ public class ProcessManagment extends JFrame {
 
 
         JLabel Blable=new JLabel("Blocked Table");
-        Blable.setBounds(10,430,750,100);
+        Blable.setBounds(110,440,750,100);
         add(Blable);
         blockedTableModel = new DefaultTableModel();
         blockedTable = new JTable(blockedTableModel);
@@ -115,17 +122,18 @@ public class ProcessManagment extends JFrame {
         blockedTableModel.addColumn("Status");
 
         JScrollPane blockedScrollPane = new JScrollPane(blockedTable);
-        blockedScrollPane.setBounds(10, 500, 750, 100);
+        blockedScrollPane.setBounds(110, 500, 750, 100);
         add(blockedScrollPane);
 
         createButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String id = idField.getText().trim();
+                String id = idField.getText();
                 if (id.isEmpty()) {
                     Random random = new Random();
                     id = "P" + random.nextInt(1000);
                     idField.setText(id);
+
                 } else {
                     boolean idExists = false;
                     for (int i = 0; i < model.getRowCount(); i++) {
@@ -138,6 +146,8 @@ public class ProcessManagment extends JFrame {
                         JOptionPane.showMessageDialog(null, "Enter a different ID. This ID already exists.", "Error", JOptionPane.ERROR_MESSAGE);
                         return;
                     }
+
+
                 }
 
                 int arrivalTime = Integer.parseInt(arrivalField.getText());
@@ -149,11 +159,14 @@ public class ProcessManagment extends JFrame {
                 row.add("Ready State");
 
                 model.addRow(row);
+                idField.setText(" ");
+                arrivalField.setText(" ");
+                burstField.setText(" ");
             }
         });
 
 
-        deleteButton.addActionListener(new ActionListener() {
+        Destory.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String idToDelete = idField.getText();
@@ -206,7 +219,7 @@ public class ProcessManagment extends JFrame {
             }
         });
 
-        resumeButton.addActionListener(new ActionListener() {
+        resume.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 Vector<String> row = new Vector<>();

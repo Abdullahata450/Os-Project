@@ -215,7 +215,7 @@ public class OSProject {
                         JOptionPane.showMessageDialog(null, "Process ID not found.", "Error", JOptionPane.ERROR_MESSAGE);
                     } else {
                         JOptionPane.showMessageDialog(null,"Data Deleted Succefully");
-                        ShowData(); // Update the table after removing data
+                        ShowData(); 
                     }
                 } else {
                     JOptionPane.showMessageDialog(null, "Enter a Process ID to delete.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -265,27 +265,10 @@ public class OSProject {
 
 
         resumeButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                for (int i = 0; i < blockedTableModel.getRowCount(); i++) {
-                    String id = (String) blockedTableModel.getValueAt(i, 0);
-                    int arrivalTime = (int) blockedTableModel.getValueAt(i, 1);
-                    int burstTime = (int) blockedTableModel.getValueAt(i, 2);
+         public void actionPerformed(ActionEvent e) {
 
-                    Vector<Object> rowData = new Vector<>();
-                    rowData.add(id);
-                    rowData.add(arrivalTime);
-                    rowData.add(burstTime);
-                    rowData.add("Ready State");
-                    processIDs.add(id);
-                    arrivalTimes.add(arrivalTime);
-                    burstTimes.add(burstTime);
-                    model.addRow(rowData);
-                }
-                blockedTableModel.setRowCount(0);
-                JOptionPane.showMessageDialog(null,"Process Resume ");
-                ShowData();
-            }
+            }                                                     // remaining
+        
         });
 
         WakeupButton.addActionListener(new ActionListener() {     // remaining

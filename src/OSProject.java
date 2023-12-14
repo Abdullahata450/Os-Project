@@ -215,7 +215,7 @@ public class OSProject {
                         JOptionPane.showMessageDialog(null, "Process ID not found.", "Error", JOptionPane.ERROR_MESSAGE);
                     } else {
                         JOptionPane.showMessageDialog(null,"Data Deleted Succefully");
-                        ShowData(); // Update the table after removing data
+                        ShowData(); 
                     }
                 } else {
                     JOptionPane.showMessageDialog(null, "Enter a Process ID to delete.", "Error", JOptionPane.ERROR_MESSAGE);

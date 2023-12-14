@@ -100,11 +100,11 @@ public class OSProject {
 
         model = new DefaultTableModel();
         processTable = new JTable(model);
-        model.addColumn("Process ID");
-        model.addColumn("Arrival Time");
-        model.addColumn("Burst Time");
-        model.addColumn("Status");
-
+//        model.addColumn("Process ID");
+//        model.addColumn("Arrival Time");
+//        model.addColumn("Burst Time");
+//        model.addColumn("Status");
+//
         JScrollPane scrollPane = new JScrollPane(processTable);
         scrollPane.setBounds(110, 170, 750, 300);
 
@@ -290,13 +290,67 @@ public class OSProject {
 
         WakeupButton.addActionListener(new ActionListener() {     // remaining
             public void actionPerformed(ActionEvent e) {
+                for (int i = 0; i < blockedTableModel.getRowCount(); i++) {
+                    String id = (String) blockedTableModel.getValueAt(i, 0);
+                    int arrivalTime = (int) blockedTableModel.getValueAt(i, 1);
+                    int burstTime = (int) blockedTableModel.getValueAt(i, 2);
 
+                    Vector<Object> row = new Vector<>();
+                    row.add(id);
+                    row.add(arrivalTime);
+                    row.add(burstTime);
+                    row.add("Ready");
+
+                    blockedTableModel.removeRow(i);
+                    processIDs.add(id);
+                    arrivalTimes.add(arrivalTime);
+                    burstTimes.add(burstTime);
+
+                    model.addRow(row);
+                }
+
+                ShowData();
+                JOptionPane.showMessageDialog(null, "All blocked processes are now ready");
             }
         });
 
         blockButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {          // remaining
+                String idToBlock = idField.getText();
+                if (!idToBlock.isBlank()) {
+                    boolean found = false;
+                    for (int i = 0; i < processIDs.size(); i++) {
+                        if (idToBlock.equals(processIDs.get(i))) {
+                            String id = processIDs.get(i);
+                            int arrivalTime = arrivalTimes.get(i);
+                            int burstTime = burstTimes.get(i);
+                            String status = "Blocked";
 
+                            Vector<Object> row = new Vector<>();
+                            row.add(id);
+                            row.add(arrivalTime);
+                            row.add(burstTime);
+                            row.add(status);
+
+                            blockedTableModel.addRow(row);
+
+                            processIDs.remove(i);
+                            arrivalTimes.remove(i);
+                            burstTimes.remove(i);
+                            found = true;
+                            break;
+
+                        }
+                    }
+                    if (!found) {
+                        JOptionPane.showMessageDialog(null, "Process ID not found.", "Error", JOptionPane.ERROR_MESSAGE);
+                    } else {
+                        ShowData();
+                        JOptionPane.showMessageDialog(null, "Process Blocked");
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(null, "Enter a Process ID to block.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
 
@@ -324,9 +378,9 @@ public class OSProject {
             processTable.setModel(tableModel);
         } else {
             processTable = new JTable(tableModel);
-            JScrollPane scrollPane = new JScrollPane(processTable);
-            scrollPane.setBounds(110, 170, 750, 300);
-            frame.add(scrollPane);
+//            JScrollPane scrollPane = new JScrollPane(processTable);
+//            scrollPane.setBounds(110, 170, 750, 300);
+//            frame.add(scrollPane);
         }
     }
 

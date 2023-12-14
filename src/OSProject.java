@@ -265,27 +265,8 @@ public class OSProject {
 
 
         resumeButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                for (int i = 0; i < blockedTableModel.getRowCount(); i++) {
-                    String id = (String) blockedTableModel.getValueAt(i, 0);
-                    int arrivalTime = (int) blockedTableModel.getValueAt(i, 1);
-                    int burstTime = (int) blockedTableModel.getValueAt(i, 2);
-
-                    Vector<Object> rowData = new Vector<>();
-                    rowData.add(id);
-                    rowData.add(arrivalTime);
-                    rowData.add(burstTime);
-                    rowData.add("Ready State");
-                    processIDs.add(id);
-                    arrivalTimes.add(arrivalTime);
-                    burstTimes.add(burstTime);
-                    model.addRow(rowData);
-                }
-                blockedTableModel.setRowCount(0);
-                JOptionPane.showMessageDialog(null,"Process Resume ");
-                ShowData();
-            }
+        
+        
         });
 
         WakeupButton.addActionListener(new ActionListener() {     // remaining

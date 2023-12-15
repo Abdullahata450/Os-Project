@@ -61,10 +61,17 @@ public class OSProject {
         frame.add(button5);
 
         button1.addActionListener(new ActionListener() {
-            @Override
             public void actionPerformed(ActionEvent e) {
                 frame.getContentPane().removeAll();
                 processManagement();
+                ShowData();
+            }
+        });
+
+        button2.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                frame.getContentPane().removeAll();
+                ProcessScheduling();
                 ShowData();
             }
         });
@@ -215,7 +222,7 @@ public class OSProject {
                         JOptionPane.showMessageDialog(null, "Process ID not found.", "Error", JOptionPane.ERROR_MESSAGE);
                     } else {
                         JOptionPane.showMessageDialog(null,"Data Deleted Succefully");
-                        ShowData(); 
+                        ShowData();
                     }
                 } else {
                     JOptionPane.showMessageDialog(null, "Enter a Process ID to delete.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -266,53 +273,84 @@ public class OSProject {
 
         resumeButton.addActionListener(new ActionListener() {
              public void actionPerformed(ActionEvent e){
-                 for (int i = 0; i < blockedTableModel.getRowCount(); i++) {
-                     String id = (String) blockedTableModel.getValueAt(i, 0);
-                     int arrivalTime = (int) blockedTableModel.getValueAt(i, 1);
-                     int burstTime = (int) blockedTableModel.getValueAt(i, 2);
+                 boolean foundSuspended =false;
 
-                     Vector<Object> rowData = new Vector<>();
-                     rowData.add(id);
-                     rowData.add(arrivalTime);
-                     rowData.add(burstTime);
-                     rowData.add("Ready State");
-                     processIDs.add(id);
-                     arrivalTimes.add(arrivalTime);
-                     burstTimes.add(burstTime);
-                     model.addRow(rowData);
+                 for (int i = 0; i < blockedTableModel.getRowCount(); i++) {
+                     String status =(String) blockedTableModel.getValueAt(i,3);
+
+                     if (status.equals("Suspended")){
+                         foundSuspended=true;
+                         String id = (String) blockedTableModel.getValueAt(i, 0);
+                         int arrivalTime = (int) blockedTableModel.getValueAt(i, 1);
+                         int burstTime = (int) blockedTableModel.getValueAt(i, 2);
+
+                         Vector<Object> rowData = new Vector<>();
+                         rowData.add(id);
+                         rowData.add(arrivalTime);
+                         rowData.add(burstTime);
+                         rowData.add("Ready State");
+                         processIDs.add(id);
+                         arrivalTimes.add(arrivalTime);
+                         burstTimes.add(burstTime);
+                         model.addRow(rowData);
+
+                     }
+                     if (foundSuspended==true){
+                         blockedTableModel.setRowCount(0);
+                         JOptionPane.showMessageDialog(null, "Process Resume ");
+                         ShowData();
+
+                     }
+                     else{
+                         JOptionPane.showMessageDialog(null, "No processes in Suspended state to resume.", "Information", JOptionPane.INFORMATION_MESSAGE);
+                     }
+
+
+
                  }
-                 blockedTableModel.setRowCount(0);
-                 JOptionPane.showMessageDialog(null, "Process Resume ");
-                 ShowData();
 
              }
-                               // remaining
+
         
         });
 
         WakeupButton.addActionListener(new ActionListener() {     // remaining
             public void actionPerformed(ActionEvent e) {
+                boolean foundBlock =false;
                 for (int i = 0; i < blockedTableModel.getRowCount(); i++) {
-                    String id = (String) blockedTableModel.getValueAt(i, 0);
-                    int arrivalTime = (int) blockedTableModel.getValueAt(i, 1);
-                    int burstTime = (int) blockedTableModel.getValueAt(i, 2);
+                    String status= (String) blockedTableModel.getValueAt(i,3);
+                    if (status.equals("Blocked")){
+                        foundBlock=true;
+                        String id = (String) blockedTableModel.getValueAt(i, 0);
+                        int arrivalTime = (int) blockedTableModel.getValueAt(i, 1);
+                        int burstTime = (int) blockedTableModel.getValueAt(i, 2);
 
-                    Vector<Object> row = new Vector<>();
-                    row.add(id);
-                    row.add(arrivalTime);
-                    row.add(burstTime);
-                    row.add("Ready");
+                        Vector<Object> row = new Vector<>();
+                        row.add(id);
+                        row.add(arrivalTime);
+                        row.add(burstTime);
+                        row.add("Ready");
 
-                    blockedTableModel.removeRow(i);
-                    processIDs.add(id);
-                    arrivalTimes.add(arrivalTime);
-                    burstTimes.add(burstTime);
+                        blockedTableModel.removeRow(i);
+                        processIDs.add(id);
+                        arrivalTimes.add(arrivalTime);
+                        burstTimes.add(burstTime);
 
-                    model.addRow(row);
+                        model.addRow(row);
+                    }
+                    if (foundBlock=true){
+                        ShowData();
+                        JOptionPane.showMessageDialog(null, "All blocked processes are now ready");
+                    }
+                    else{
+                        JOptionPane.showMessageDialog(null, "No Prcess Are in Blocked State");
+
+                    }
+
+
                 }
 
-                ShowData();
-                JOptionPane.showMessageDialog(null, "All blocked processes are now ready");
+
             }
         });
 
@@ -380,11 +418,88 @@ public class OSProject {
             processTable.setModel(tableModel);
         } else {
             processTable = new JTable(tableModel);
-//            JScrollPane scrollPane = new JScrollPane(processTable);
-//            scrollPane.setBounds(110, 170, 750, 300);
-//            frame.add(scrollPane);
+            JScrollPane scrollPane = new JScrollPane(processTable);
+            scrollPane.setBounds(110, 170, 750, 300);
+            frame.add(scrollPane);
         }
     }
+
+    public void ProcessScheduling() {
+        frame.setTitle("Process Scheduling");
+        frame.setSize(1100, 700);
+
+        DefaultTableModel schedulingTableModel = new DefaultTableModel();
+
+
+        JPanel mainPanel = new JPanel(new GridLayout(1, 1, 10, 10));
+        mainPanel.setBounds(10, 10, 250, 50);
+
+
+        JButton backButton = new JButton("GO Back");
+        backButton.setBounds(740, 50, 150, 30);
+
+        JButton FCFS=new JButton("FCFS");
+        FCFS.setBounds(30,90,150,30);
+
+
+        frame.add(mainPanel);
+        frame.add(backButton);
+        frame.add(FCFS);
+
+        backButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                frame.setVisible(false);
+                mainMenu();
+            }
+        });
+        FCFS.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                for (int i=0;i<schedulingTableModel.getRowCount();i++){
+
+                        String processID = (String) schedulingTableModel.getValueAt(i, 0);
+                        int arrivalTime = (int) schedulingTableModel.getValueAt(i, 1);
+                        int burstTime = (int) schedulingTableModel.getValueAt(i, 2);
+
+
+                        int completionTime = arrivalTime + burstTime;
+                        int turnaroundTime = completionTime - arrivalTime;
+                        int waitingTime = turnaroundTime - burstTime;
+
+
+
+                        schedulingTableModel.setValueAt(completionTime, i, 4);
+                        schedulingTableModel.setValueAt(waitingTime, i, 5);
+                        schedulingTableModel.setValueAt(turnaroundTime, i, 6);
+                }
+            }
+        });
+
+        schedulingTableModel.addColumn("Process ID");
+        schedulingTableModel.addColumn("Arrival Time");
+        schedulingTableModel.addColumn("Burst Time");
+        schedulingTableModel.addColumn("Process Status");
+        schedulingTableModel.addColumn("Complete Time");
+        schedulingTableModel.addColumn("Wating Time");
+        schedulingTableModel.addColumn("TAT Time");
+
+
+        for (int i = 0; i < processIDs.size(); i++) {
+            String id = processIDs.get(i);
+            int arrivalTime = arrivalTimes.get(i);
+            int burstTime = burstTimes.get(i);
+
+            Object[] rowData = {id, arrivalTime, burstTime,"Ready"};
+            schedulingTableModel.addRow(rowData);
+        }
+
+        JTable schedulingTable = new JTable(schedulingTableModel);
+        JScrollPane scrollPane = new JScrollPane(schedulingTable);
+        scrollPane.setBounds(110, 170, 750, 300);
+        frame.add(scrollPane);
+
+        frame.setVisible(true);
+    }
+
 
 
 

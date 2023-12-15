@@ -18,6 +18,7 @@ The OSProject is a Java application that simulates various operations related to
 
 ### Process Scheduling
 - Supports scheduling algorithms like FCFS.
+- And some are UnderDeveloping
 - Calculates completion time, waiting time, and turnaround time for processes.
 
 ### How to Run
@@ -32,10 +33,5 @@ The OSProject is a Java application that simulates various operations related to
 - This project utilizes Swing for the GUI (Graphical User Interface) components.
 
 ## Contributors
-- [Your Name or Username] - Provide details if this is an open-source project and you're looking for contributors.
+- [Abdullah-Ata] - Provide details if this is an open-source project and you're looking for contributors.
 
-## License
-- Specify the license under which this project is shared (e.g., MIT License, Apache License, etc.).
-
-## Notes
-- Add any additional information or notes about the project, its functionality, or how to extend it.

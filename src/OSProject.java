@@ -72,7 +72,7 @@ public class OSProject {
             public void actionPerformed(ActionEvent e) {
                 frame.getContentPane().removeAll();
                 ProcessScheduling();
-                ShowData();
+//                ShowData();
             }
         });
 
@@ -150,7 +150,7 @@ public class OSProject {
             }
         });
 
-        JLabel blockLabel = new JLabel("Blocked Table");
+        JLabel blockLabel = new JLabel("Blocked And Suspend Table");
         blockLabel.setBounds(110, 440, 750, 100);
         frame.add(blockLabel);
 
@@ -355,7 +355,7 @@ public class OSProject {
         });
 
         blockButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {          // remaining
+            public void actionPerformed(ActionEvent e) {
                 String idToBlock = idField.getText();
                 if (!idToBlock.isBlank()) {
                     boolean found = false;
@@ -440,39 +440,14 @@ public class OSProject {
 
         JButton FCFS=new JButton("FCFS");
         FCFS.setBounds(30,90,150,30);
+        JButton SJF = new JButton("SJF");
+        SJF.setBounds(200, 90, 150, 30);
 
 
         frame.add(mainPanel);
         frame.add(backButton);
         frame.add(FCFS);
-
-        backButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                frame.setVisible(false);
-                mainMenu();
-            }
-        });
-        FCFS.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                for (int i=0;i<schedulingTableModel.getRowCount();i++){
-
-                        String processID = (String) schedulingTableModel.getValueAt(i, 0);
-                        int arrivalTime = (int) schedulingTableModel.getValueAt(i, 1);
-                        int burstTime = (int) schedulingTableModel.getValueAt(i, 2);
-
-
-                        int completionTime = arrivalTime + burstTime;
-                        int turnaroundTime = completionTime - arrivalTime;
-                        int waitingTime = turnaroundTime - burstTime;
-
-
-
-                        schedulingTableModel.setValueAt(completionTime, i, 4);
-                        schedulingTableModel.setValueAt(waitingTime, i, 5);
-                        schedulingTableModel.setValueAt(turnaroundTime, i, 6);
-                }
-            }
-        });
+        frame.add(SJF);
 
         schedulingTableModel.addColumn("Process ID");
         schedulingTableModel.addColumn("Arrival Time");
@@ -491,6 +466,74 @@ public class OSProject {
             Object[] rowData = {id, arrivalTime, burstTime,"Ready"};
             schedulingTableModel.addRow(rowData);
         }
+
+
+        backButton.addActionListener(new ActionListener() {    // back btn
+            public void actionPerformed(ActionEvent e) {
+                frame.setVisible(false);
+                mainMenu();
+            }
+        });
+        FCFS.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {                      // fcfs btn
+                for (int i=0;i<schedulingTableModel.getRowCount();i++){
+
+//                        String processID = (String) schedulingTableModel.getValueAt(i, 0);
+                        int arrivalTime = (int) schedulingTableModel.getValueAt(i, 1);
+                        int burstTime = (int) schedulingTableModel.getValueAt(i, 2);
+
+                        int completionTime = arrivalTime + burstTime;
+                        int turnaroundTime = completionTime - arrivalTime;
+                        int waitingTime = turnaroundTime - burstTime;
+
+                        schedulingTableModel.setValueAt(completionTime, i, 4);
+                        schedulingTableModel.setValueAt(waitingTime, i, 5);
+                        schedulingTableModel.setValueAt(turnaroundTime, i, 6);
+                }
+            }
+        });
+        SJF.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                // SJF Scheduling Algorithm
+                // Sort the processes based on burst time (shortest burst time first)
+                for (int i = 0; i < schedulingTableModel.getRowCount() - 1; i++) {
+                    for (int j = 0; j < schedulingTableModel.getRowCount() - i - 1; j++) {
+                        int burstTime1 = (int) schedulingTableModel.getValueAt(j, 2);
+                        int burstTime2 = (int) schedulingTableModel.getValueAt(j + 1, 2);
+
+                        if (burstTime1 > burstTime2) {
+                            // Swap rows
+                            for (int k = 0; k < schedulingTableModel.getColumnCount(); k++) {
+                                Object temp = schedulingTableModel.getValueAt(j, k);
+                                schedulingTableModel.setValueAt(schedulingTableModel.getValueAt(j + 1, k), j, k);
+                                schedulingTableModel.setValueAt(temp, j + 1, k);
+                            }
+                        }
+                    }
+                }
+
+                // Calculate completion time, turnaround time, and waiting time
+                int completionTime = 0;
+                for (int i = 0; i < schedulingTableModel.getRowCount(); i++) {
+                    int arrivalTime = (int) schedulingTableModel.getValueAt(i, 1);
+                    int burstTime = (int) schedulingTableModel.getValueAt(i, 2);
+
+                    if (arrivalTime > completionTime) {
+                        completionTime = arrivalTime;
+                    }
+
+                    completionTime += burstTime;
+                    int turnaroundTime = completionTime - arrivalTime;
+                    int waitingTime = turnaroundTime - burstTime;
+
+                    schedulingTableModel.setValueAt(completionTime, i, 4);
+                    schedulingTableModel.setValueAt(waitingTime, i, 5);
+                    schedulingTableModel.setValueAt(turnaroundTime, i, 6);
+                }
+            }
+        });
+
+
 
         JTable schedulingTable = new JTable(schedulingTableModel);
         JScrollPane scrollPane = new JScrollPane(schedulingTable);

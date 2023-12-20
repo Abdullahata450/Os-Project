@@ -12,6 +12,9 @@ public class OSProject {
     private DefaultTableModel model;
     private JTable processTable;
 
+    private DefaultTableModel ReadymodelTable;
+    private JTable ReadyTable;
+
     private DefaultTableModel blockedTableModel;
     private JTable blockedTable;
     private JFrame frame;
@@ -23,10 +26,17 @@ public class OSProject {
        private ArrayList<Integer> arrivalTimes;
        private ArrayList<Integer> burstTimes;
 
+    private ArrayList<String> RprocessIDs;
+    private ArrayList<Integer> RarrivalTimes;
+    private ArrayList<Integer> RburstTimes;
+
     public OSProject() {
         processIDs = new ArrayList<>();
         arrivalTimes = new ArrayList<>();
         burstTimes = new ArrayList<>();
+        RprocessIDs = new ArrayList<>();
+        RarrivalTimes = new ArrayList<>();
+        RburstTimes = new ArrayList<>();
     }
 
 
@@ -65,6 +75,7 @@ public class OSProject {
                 frame.getContentPane().removeAll();
                 processManagement();
                 ShowData();
+//                ShowdatainRunning();
             }
         });
 
@@ -72,6 +83,7 @@ public class OSProject {
             public void actionPerformed(ActionEvent e) {
                 frame.getContentPane().removeAll();
                 ProcessScheduling();
+
 //                ShowData();
             }
         });
@@ -83,7 +95,7 @@ public class OSProject {
     public void processManagement() {
 
         frame.setTitle("Process Management");
-        frame.setSize(1100, 700);
+        frame.setSize(1300, 900);
 
         JPanel mainPanel = new JPanel(new GridLayout(3, 2, 10, 10));
         mainPanel.setBounds(10, 10, 300, 150);
@@ -103,17 +115,33 @@ public class OSProject {
         JButton resumeButton = new JButton("Resume Process");
         JButton Suspendbutton=new JButton("Suspend Process");
         JButton WakeupButton=new JButton("Wakeup process");
+        JButton dispatchbtn=new JButton("Dispatch Process");
         JButton backButton = new JButton("Go Back");
 
         model = new DefaultTableModel();
         processTable = new JTable(model);
-//        model.addColumn("Process ID");
-//        model.addColumn("Arrival Time");
-//        model.addColumn("Burst Time");
-//        model.addColumn("Status");
-//
+        model.addColumn("Process ID");
+        model.addColumn("Arrival Time");
+        model.addColumn("Burst Time");
+        model.addColumn("Status");
+
         JScrollPane scrollPane = new JScrollPane(processTable);
-        scrollPane.setBounds(110, 170, 750, 300);
+        scrollPane.setBounds(30, 170, 650, 200);
+
+        // Added new Table Ready Table
+        JLabel ReadyLable=new JLabel("Suspend  Table ");
+        ReadyLable.setBounds(710,345,650,200);
+        frame.add(ReadyLable);
+
+        ReadymodelTable= new DefaultTableModel();
+        ReadyTable=new JTable(ReadymodelTable);
+        JScrollPane Readypane=new JScrollPane(ReadyTable);
+        Readypane.setBounds(30,400,650,200);
+        ReadymodelTable.addColumn("Proces ID");
+        ReadymodelTable.addColumn("Arival Time");
+        ReadymodelTable.addColumn("Burst Time");
+        ReadymodelTable.addColumn("Status");
+
 
         mainPanel.add(idLabel);
         mainPanel.add(idField);
@@ -124,6 +152,7 @@ public class OSProject {
 
         frame.add(mainPanel);
         frame.add(scrollPane);
+        frame.add(Readypane);
 
         createButton.setBounds(350, 50, 150, 30);
         destroyButton.setBounds(550, 50, 150, 30);
@@ -132,6 +161,7 @@ public class OSProject {
         backButton.setBounds(740, 50, 150, 30);
         Suspendbutton.setBounds(740,100,150,30);
         WakeupButton.setBounds(900,50,150,30);
+        dispatchbtn.setBounds(900,100,150,30);
 
         frame.add(createButton);
         frame.add(destroyButton);
@@ -140,6 +170,7 @@ public class OSProject {
         frame.add(backButton);
         frame.add(Suspendbutton);
         frame.add(WakeupButton);
+        frame.add(dispatchbtn);
 
         backButton.addActionListener(new ActionListener() {
             @Override
@@ -151,7 +182,7 @@ public class OSProject {
         });
 
         JLabel blockLabel = new JLabel("Blocked And Suspend Table");
-        blockLabel.setBounds(110, 440, 750, 100);
+        blockLabel.setBounds(30, 170, 650, 100);
         frame.add(blockLabel);
 
         blockedTableModel = new DefaultTableModel();
@@ -162,8 +193,56 @@ public class OSProject {
         blockedTableModel.addColumn("Status");
 
         JScrollPane blockedScrollPane = new JScrollPane(blockedTable);
-        blockedScrollPane.setBounds(110, 500, 750, 100);
+        blockedScrollPane.setBounds(710, 350, 650, 80);
         frame.add(blockedScrollPane);
+
+
+        dispatchbtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String idToDispatch = idField.getText().trim();
+
+                if (!idToDispatch.isEmpty()) {
+                    boolean found = false;
+                    for (int i = 0; i < processIDs.size(); i++) {
+                        if (idToDispatch.equals(processIDs.get(i))) {
+                            String id = processIDs.get(i);
+                            int arrivalTime = arrivalTimes.get(i);
+                            int burstTime = burstTimes.get(i);
+                            String status = "Running";
+
+                            RprocessIDs.add(id);
+                            RarrivalTimes.add(arrivalTime);
+                            RburstTimes.add(burstTime);
+
+                            Vector<Object> row = new Vector<>();
+                            row.add(id);
+                            row.add(arrivalTime);
+                            row.add(burstTime);
+                            row.add(status);
+
+                            ReadymodelTable.addRow(row); // Add to Ready Table
+
+                            processIDs.remove(i);
+                            arrivalTimes.remove(i);
+                            burstTimes.remove(i);
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (!found) {
+                        JOptionPane.showMessageDialog(null, "Process ID not found.", "Error", JOptionPane.ERROR_MESSAGE);
+                    } else {
+                        ShowData(); // Update main table
+                        JOptionPane.showMessageDialog(null, "Process dispatched to Ready State.");
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(null, "Please enter a Process ID to dispatch.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
 
         createButton.addActionListener(new ActionListener() {
             @Override
@@ -174,11 +253,13 @@ public class OSProject {
                     id = "P" + random.nextInt(1000);
                     idField.setText(id);
                 } else {
-                    boolean idExists = processIDs.contains(id);
-                    if (idExists) {
+                    boolean idExistsInProcessIDs = processIDs.contains(id);
+                    boolean idExistsInRProcessIDs = RprocessIDs.contains(id);
+                    if (idExistsInProcessIDs || idExistsInRProcessIDs) {
                         JOptionPane.showMessageDialog(null, "Enter a different ID. This ID already exists.", "Error", JOptionPane.ERROR_MESSAGE);
                         return;
                     }
+
                 }
                 int arrivalTime;
                 int burstTime;
@@ -259,6 +340,33 @@ public class OSProject {
                         }
                     }
                     if (!found) {
+                        for (int i = 0; i < RprocessIDs.size(); i++) {
+                            if (idToSuspend.equals(RprocessIDs.get(i))) {
+
+                                String id = RprocessIDs.get(i);
+                                int arrivalTime = RarrivalTimes.get(i);
+                                int burstTime = RburstTimes.get(i);
+                                String status = "Suspended";
+
+                                Vector<Object> row = new Vector<>();
+                                row.add(id);
+                                row.add(arrivalTime);
+                                row.add(burstTime);
+                                row.add(status);
+
+                                blockedTableModel.addRow(row);
+
+                                RprocessIDs.remove(i);
+                                RarrivalTimes.remove(i);
+                                RburstTimes.remove(i);
+
+                                found = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!found) {
                         JOptionPane.showMessageDialog(null, "Process ID not found.", "Error", JOptionPane.ERROR_MESSAGE);
                     } else {
                         ShowData();
@@ -311,7 +419,7 @@ public class OSProject {
 
              }
 
-        
+
         });
 
         WakeupButton.addActionListener(new ActionListener() {     // remaining
@@ -383,6 +491,33 @@ public class OSProject {
                         }
                     }
                     if (!found) {
+                        for (int i = 0; i < RprocessIDs.size(); i++) {
+                            if (idToBlock.equals(RprocessIDs.get(i))) {
+
+                                String id = RprocessIDs.get(i);
+                                int arrivalTime = RarrivalTimes.get(i);
+                                int burstTime = RburstTimes.get(i);
+                                String status = "Blocked";
+
+                                Vector<Object> row = new Vector<>();
+                                row.add(id);
+                                row.add(arrivalTime);
+                                row.add(burstTime);
+                                row.add(status);
+
+                                blockedTableModel.addRow(row);
+
+                                RprocessIDs.remove(i);
+                                RarrivalTimes.remove(i);
+                                RburstTimes.remove(i);
+
+                                found = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!found) {
                         JOptionPane.showMessageDialog(null, "Process ID not found.", "Error", JOptionPane.ERROR_MESSAGE);
                     } else {
                         ShowData();
@@ -398,31 +533,59 @@ public class OSProject {
         frame.setVisible(true);
     }
 
-    public void ShowData() {
-        DefaultTableModel tableModel = new DefaultTableModel();
-        tableModel.addColumn("Process ID");
-        tableModel.addColumn("Arrival Time");
-        tableModel.addColumn("Burst Time");
-        tableModel.addColumn("Process Status");
-
-        for (int i = 0; i < processIDs.size(); i++) {
-            String id = processIDs.get(i);
-            int arrivalTime = arrivalTimes.get(i);
-            int burstTime = burstTimes.get(i);
-
-            Object[] rowData = {id, arrivalTime, burstTime,"Ready"};
-            tableModel.addRow(rowData);
-        }
-
-        if (processTable != null) {
-            processTable.setModel(tableModel);
-        } else {
-            processTable = new JTable(tableModel);
-            JScrollPane scrollPane = new JScrollPane(processTable);
-            scrollPane.setBounds(110, 170, 750, 300);
-            frame.add(scrollPane);
-        }
+//    public void ShowData() {
+//        DefaultTableModel tableModel = new DefaultTableModel();
+//        tableModel.addColumn("Process ID");
+//        tableModel.addColumn("Arrival Time");
+//        tableModel.addColumn("Burst Time");
+//        tableModel.addColumn("Process Status");
+//
+//        for (int i = 0; i < processIDs.size(); i++) {
+//            String id = processIDs.get(i);
+//            int arrivalTime = arrivalTimes.get(i);
+//            int burstTime = burstTimes.get(i);
+//
+//            Object[] rowData = {id, arrivalTime, burstTime,"Ready"};
+//            tableModel.addRow(rowData);
+//        }
+//
+//        if (processTable != null) {
+//            processTable.setModel(tableModel);
+//        } else {
+//            processTable = new JTable(tableModel);
+//            JScrollPane scrollPane = new JScrollPane(processTable);
+//            scrollPane.setBounds(110, 170, 750, 300);
+//            frame.add(scrollPane);
+//        }
+//    }
+//
+private void ShowData() {
+    // Update the main process table
+    model.setRowCount(0); // Clear existing data from the main table
+    for (int i = 0; i < processIDs.size(); i++) {
+        Vector<Object> row = new Vector<>();
+        row.add(processIDs.get(i));
+        row.add(arrivalTimes.get(i));
+        row.add(burstTimes.get(i));
+        row.add("Ready"); // or another appropriate status
+        model.addRow(row);
     }
+
+    // Update the ready table
+    ReadymodelTable.setRowCount(0); // Clear existing data from the ready table
+    for (int i = 0; i < RprocessIDs.size(); i++) {
+        Vector<Object> row = new Vector<>();
+        row.add(RprocessIDs.get(i));
+        row.add(RarrivalTimes.get(i));
+        row.add(RburstTimes.get(i));
+        row.add("Running"); // or another appropriate status for the ready table
+        ReadymodelTable.addRow(row);
+    }
+}
+
+
+
+
 
     public void ProcessScheduling() {
         frame.setTitle("Process Scheduling");
@@ -458,12 +621,12 @@ public class OSProject {
         schedulingTableModel.addColumn("TAT Time");
 
 
-        for (int i = 0; i < processIDs.size(); i++) {
-            String id = processIDs.get(i);
-            int arrivalTime = arrivalTimes.get(i);
-            int burstTime = burstTimes.get(i);
+        for (int i = 0; i < RprocessIDs.size(); i++) {
+            String id = RprocessIDs.get(i);
+            int arrivalTime = RarrivalTimes.get(i);
+            int burstTime = RburstTimes.get(i);
 
-            Object[] rowData = {id, arrivalTime, burstTime,"Ready"};
+            Object[] rowData = {id, arrivalTime, burstTime,"Running"};
             schedulingTableModel.addRow(rowData);
         }
 

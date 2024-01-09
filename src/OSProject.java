@@ -804,12 +804,10 @@ private void ShowData() {
             public void actionPerformed(ActionEvent e) {
                 // Remove all components
                 frame.getContentPane().removeAll();
-                frame.getContentPane().revalidate();
-                frame.getContentPane().repaint();
+//                frame.getContentPane().revalidate();
+//                frame.getContentPane().repaint();
 
-                frame.dispose();
-                mainMenu();
-
+                MemoryManagment();
 
             }
         });
@@ -970,15 +968,34 @@ private void ShowData() {
         frame.add(numOfProcessesField);
 
         JButton calculateButton = new JButton("Calculate");
-        calculateButton.setBounds(120, 150, 150, 30);
+        calculateButton.setBounds(40, 150, 120, 30);
 //        calculateButton.addActionListener(this);
         frame.add(calculateButton);
 
+
+        JButton backbtn = new JButton("Go Back");
+        backbtn.setBounds(180, 150, 120, 30);
+        frame.add(backbtn);
+
+
+
         JTextArea resultArea = new JTextArea();
-        resultArea.setBounds(20, 200, 350, 150);
+        resultArea.setBounds(20, 200, 350, 400);
         frame. add(resultArea);
 
         frame.setVisible(true);
+
+        backbtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                frame.getContentPane().removeAll();
+//                frame.getContentPane().revalidate();
+//                frame.getContentPane().repaint();
+
+                MemoryManagment();
+//                frame.dispose();
+            }
+        });
 
         calculateButton.addActionListener(new ActionListener() {
             @Override
@@ -990,7 +1007,7 @@ private void ShowData() {
                 int ms = Integer.parseInt(memorySizeField.getText());
                 int ps = Integer.parseInt(pageSizeField.getText());
                 nop = ms / ps;
-                resultArea.append("\nThe no. of pages available in memory are -- " + nop + "\n");
+                resultArea.append("\nThe no. of pages available in memory are  " + nop + "\n");
 
                 np = Integer.parseInt(numOfProcessesField.getText());
                 s = new int[np + 1];
@@ -1013,6 +1030,8 @@ private void ShowData() {
                     for (int j = 0; j < s[i]; j++) {
                         String pageTableInput = JOptionPane.showInputDialog("Enter page number " + j + " for p[" + i + "]:");
                         fno[i][j] = Integer.parseInt(pageTableInput);
+                        resultArea.append("\n page number for p[" + i + "]   "+fno[i][j]);
+
                     }
                 }
 
@@ -1035,13 +1054,6 @@ private void ShowData() {
         });
     }
 
-//    public void actionPerformed(ActionEvent e) {
-//
-//
-//        if (e.getSource() == calculateButton) {
-//
-//        }
-//    }
 
 
 

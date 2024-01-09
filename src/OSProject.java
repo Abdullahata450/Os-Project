@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.Vector;
 
@@ -85,6 +86,13 @@ public class OSProject {
                 ProcessScheduling();
 
 //                ShowData();
+            }
+        });
+        button3.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                frame.getContentPane().removeAll();
+                MemoryManagment();
             }
         });
 
@@ -705,6 +713,336 @@ private void ShowData() {
 
         frame.setVisible(true);
     }
+
+    public void MemoryManagment() {
+
+        frame.setSize(500, 500);
+        frame.setTitle("Memory Management");
+
+        JButton LRU = new JButton("Perform LRU");
+        LRU.setBounds(500 / 2 - 100, 500 / 2 - 100, 200, 40);
+        frame.add(LRU);
+
+        JButton Pagging = new JButton("Perform Pagging");
+        Pagging.setBounds(500 / 2 - 100, 500 / 2 - 50, 200, 40);
+        frame.add(Pagging);
+
+        JButton backbtn = new JButton("GO Back");
+        backbtn.setBounds(500 / 2 - 100, 500 / 2 - 0, 200, 40);
+        frame.add(backbtn);
+        backbtn.addActionListener(new ActionListener() {
+            @Override
+                public void actionPerformed(ActionEvent e) {
+                    frame.getContentPane().removeAll();
+                    frame.setVisible(false);
+                    mainMenu();
+                }
+            });
+
+        LRU.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                frame.getContentPane().removeAll();
+                frame.dispose();
+
+                PerFormeLRU();
+            }
+        });
+
+        Pagging.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                frame.getContentPane().removeAll();
+                frame.dispose();
+
+                PerFromedPagging();
+            }
+        });
+    }
+    public void PerFormeLRU(){
+        frame = new JFrame("LRU Page Replacement");
+        frame.setSize(800, 600);
+        frame.setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.Y_AXIS));
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+
+        JLabel lblRefString = new JLabel("Reference String (separated by space): ");
+        panel.add(lblRefString);
+
+        JTextField txtRefString = new JTextField();
+        txtRefString.setMaximumSize(new Dimension(Integer.MAX_VALUE, txtRefString.getPreferredSize().height));
+        panel.add(txtRefString);
+
+        JLabel lblNoFrames = new JLabel("Number of Frames: ");
+        panel.add(lblNoFrames);
+
+        JTextField txtNoFrames = new JTextField();
+        txtNoFrames.setMaximumSize(new Dimension(Integer.MAX_VALUE, txtNoFrames.getPreferredSize().height));
+        panel.add(txtNoFrames);
+
+        JButton btnProcess = new JButton("Process");
+        btnProcess.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                processLRU(txtRefString, txtNoFrames);
+            }
+        });
+        panel.add(btnProcess);
+
+        frame.add(panel);
+
+        model = new DefaultTableModel();
+        JTable table = new JTable(model);
+        JScrollPane scrollPane = new JScrollPane(table);
+        frame.add(scrollPane);
+
+        frame.setVisible(true);
+        JButton backbtn=new JButton("go back");
+        frame.add(backbtn,BorderLayout.SOUTH);
+
+        backbtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Remove all components
+                frame.getContentPane().removeAll();
+                frame.getContentPane().revalidate();
+                frame.getContentPane().repaint();
+
+                frame.dispose();
+                mainMenu();
+
+
+            }
+        });
+
+    }
+
+
+//    private void processLRU(JTextField txtRefString, JTextField txtNoFrames) {
+//
+//        String[] refString = txtRefString.getText().trim().split("\\s+");
+//        int nofaults = Integer.parseInt(txtNoFrames.getText().trim());
+//
+//        int[] pages = new int[refString.length];
+//        for (int i = 0; i < refString.length; i++) {
+//            pages[i] = Integer.parseInt(refString[i]);
+//        }
+//
+//        int[] frame = new int[nofaults];
+//        int[] lastUsed = new int[nofaults];
+//        Arrays.fill(frame, -1); // Initialize all frames as empty
+//        Arrays.fill(lastUsed, -1); // Initialize all last used times as -1
+//
+//        Vector<String> columnNames = new Vector<>();
+//        columnNames.add("Page Reference");
+//        for (int i = 0; i < nofaults; i++) {
+//            columnNames.add("Frame " + (i + 1));
+//        }
+//        columnNames.add("Page Fault");
+//        model.setColumnIdentifiers(columnNames);
+//
+//        int count = 0; // Count of page faults
+//        for (int i = 0; i < pages.length; i++) {
+//            int page = pages[i];
+//            int minLastUsedIndex = 0;
+//            boolean pageFault = true;
+//
+//            for (int j = 0; j < nofaults; j++) {
+//                if (frame[j] == page) {
+//                    // Page found in a frame, update last used time
+//                    lastUsed[j] = i;
+//                    pageFault = false;
+//                    break;
+//                }
+//                if (lastUsed[j] < lastUsed[minLastUsedIndex]) {
+//                    minLastUsedIndex = j;
+//                }
+//            }
+//
+//            if (pageFault) {
+//                // Replace the least recently used page in the frame
+//                frame[minLastUsedIndex] = page;
+//                lastUsed[minLastUsedIndex] = i;
+//                count++;
+//            }
+//
+//            Vector<Object> row = new Vector<>();
+//            row.add(page);
+//            for (int j = 0; j < nofaults; j++) {
+//                row.add(frame[j] == -1 ? "Empty" : frame[j]);
+//            }
+//            row.add(pageFault ? "Yes" : "No");
+//            model.addRow(row);
+//        }
+//
+//        JOptionPane.showMessageDialog(null, "Total Page Faults: " + count, "Result", JOptionPane.INFORMATION_MESSAGE);
+//    }
+
+    private void processLRU(JTextField txtRefString, JTextField txtNoFrames) {
+        String[] refString = txtRefString.getText().trim().split("\\s+");
+        int nofaults = Integer.parseInt(txtNoFrames.getText().trim());
+
+        int[] pages = new int[refString.length];
+        for (int i = 0; i < refString.length; i++) {
+            pages[i] = Integer.parseInt(refString[i]);
+        }
+
+        int[] frame = new int[nofaults];
+        Arrays.fill(frame, -1); // Initialize all frames as empty
+        int[] lastUsed = new int[nofaults];
+        Arrays.fill(lastUsed, -1); // Initialize all last used times as -1
+
+        Vector<String> columnNames = new Vector<>();
+        columnNames.add("Page Reference");
+        for (int i = 0; i < nofaults; i++) {
+            columnNames.add("Frame " + (i + 1));
+        }
+        columnNames.add("Page Fault");
+        model.setColumnIdentifiers(columnNames);
+
+        int count = 0; // Count of page faults
+        for (int i = 0; i < pages.length; i++) {
+            int page = pages[i];
+            int minLastUsedIndex = -1;
+            boolean pageFault = true;
+
+            for (int j = 0; j < nofaults; j++) {
+                if (frame[j] == page) {
+                    lastUsed[j] = i;
+                    pageFault = false;
+                    break;
+                }
+                if (minLastUsedIndex == -1 || lastUsed[j] < lastUsed[minLastUsedIndex]) {
+                    minLastUsedIndex = j;
+                }
+            }
+
+            if (pageFault) {
+                frame[minLastUsedIndex] = page;
+                lastUsed[minLastUsedIndex] = i;
+                count++;
+            }
+
+            Vector<Object> row = new Vector<>();
+            row.add(page);
+            for (int j = 0; j < nofaults; j++) {
+                row.add(frame[j] == -1 ? "Empty" : frame[j]);
+            }
+            row.add(pageFault ? "Yes" : "No");
+            model.addRow(row);
+        }
+
+        JOptionPane.showMessageDialog(null, "Total Page Faults: " + count, "Result", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+
+    public  void PerFromedPagging(){
+
+
+
+
+        frame.setTitle("Memory Management");
+        frame.setSize(400, 400);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setLayout(null);
+
+        JLabel memorySizeLabel = new JLabel("Enter the memory size: ");
+        memorySizeLabel.setBounds(20, 20, 150, 30);
+        frame.add(memorySizeLabel);
+
+        JTextField memorySizeField = new JTextField();
+        memorySizeField.setBounds(180, 20, 150, 30);
+        frame.add(memorySizeField);
+
+        JLabel pageSizeLabel = new JLabel("Enter the page size: ");
+        pageSizeLabel.setBounds(20, 60, 150, 30);
+        frame.add(pageSizeLabel);
+
+       JTextField pageSizeField = new JTextField();
+        pageSizeField.setBounds(180, 60, 150, 30);
+        frame.add(pageSizeField);
+
+        JLabel numOfProcessesLabel = new JLabel("Enter number of processes: ");
+        numOfProcessesLabel.setBounds(20, 100, 200, 30);
+        frame.add(numOfProcessesLabel);
+
+       JTextField  numOfProcessesField = new JTextField();
+        numOfProcessesField.setBounds(220, 100, 150, 30);
+        frame.add(numOfProcessesField);
+
+        JButton calculateButton = new JButton("Calculate");
+        calculateButton.setBounds(120, 150, 150, 30);
+//        calculateButton.addActionListener(this);
+        frame.add(calculateButton);
+
+        JTextArea resultArea = new JTextArea();
+        resultArea.setBounds(20, 200, 350, 150);
+        frame. add(resultArea);
+
+        frame.setVisible(true);
+
+        calculateButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int nop, np;
+                int[] s;
+                int[][] fno;
+
+                int ms = Integer.parseInt(memorySizeField.getText());
+                int ps = Integer.parseInt(pageSizeField.getText());
+                nop = ms / ps;
+                resultArea.append("\nThe no. of pages available in memory are -- " + nop + "\n");
+
+                np = Integer.parseInt(numOfProcessesField.getText());
+                s = new int[np + 1];
+                fno = new int[np + 1][20];
+
+                int remPages = nop;
+                for (int i = 1; i <= np; i++) {
+                    String pagesRequiredStr = JOptionPane.showInputDialog("Enter no. of pages required for p[" + i + "]:");
+                    int pagesRequired = Integer.parseInt(pagesRequiredStr);
+                    s[i] = pagesRequired;
+
+                    if (s[i] > remPages) {
+                        resultArea.append("\nMemory is Full");
+                        break;
+                    }
+
+                    remPages -= s[i];
+
+                    resultArea.append("\nEnter page table for p[" + i + "] --- ");
+                    for (int j = 0; j < s[i]; j++) {
+                        String pageTableInput = JOptionPane.showInputDialog("Enter page number " + j + " for p[" + i + "]:");
+                        fno[i][j] = Integer.parseInt(pageTableInput);
+                    }
+                }
+
+                String processNoStr = JOptionPane.showInputDialog("Enter process no.:");
+                int processNo = Integer.parseInt(processNoStr);
+
+                String pageNoStr = JOptionPane.showInputDialog("Enter page number:");
+                int pageNo = Integer.parseInt(pageNoStr);
+
+                String offsetStr = JOptionPane.showInputDialog("Enter offset:");
+                int offset = Integer.parseInt(offsetStr);
+
+                if (processNo > np || pageNo >= s[processNo] || offset >= ps) {
+                    resultArea.append("\nInvalid Process or Page Number or offset");
+                } else {
+                    int pa = fno[processNo][pageNo] * ps + offset;
+                    resultArea.append("\nThe Physical Address is -- " + pa + "\n");
+                }
+            }
+        });
+    }
+
+//    public void actionPerformed(ActionEvent e) {
+//
+//
+//        if (e.getSource() == calculateButton) {
+//
+//        }
+//    }
+
 
 
 

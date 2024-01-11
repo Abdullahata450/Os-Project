@@ -3,6 +3,10 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
@@ -63,7 +67,7 @@ public class OSProject {
         button3.setBounds(size.width / 2 - 100, size.height / 2, 200, 40);
         frame.add(button3);
 
-        JButton button4 = new JButton("I/O management");
+        JButton button4 = new JButton("Process Communication");
         button4.setBounds(size.width / 2 - 100, size.height / 2 + 50, 200, 40);
         frame.add(button4);
 
@@ -96,6 +100,16 @@ public class OSProject {
             }
         });
 
+
+        button4.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+               new Socket_Client();
+
+
+            }
+        });
 
         frame.setVisible(true);
     }

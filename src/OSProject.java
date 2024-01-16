@@ -3,10 +3,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
@@ -627,12 +624,16 @@ private void ShowData() {
         FCFS.setBounds(30,90,150,30);
         JButton SJF = new JButton("SJF");
         SJF.setBounds(200, 90, 150, 30);
+        JButton SJFpreemitive = new JButton("SJF preemetive");
+        SJFpreemitive.setBounds(400, 90, 150, 30);
 
 
         frame.add(mainPanel);
         frame.add(backButton);
         frame.add(FCFS);
         frame.add(SJF);
+        frame.add(SJFpreemitive);
+
 
         schedulingTableModel.addColumn("Process ID");
         schedulingTableModel.addColumn("Arrival Time");
@@ -714,6 +715,95 @@ private void ShowData() {
                     schedulingTableModel.setValueAt(completionTime, i, 4);
                     schedulingTableModel.setValueAt(waitingTime, i, 5);
                     schedulingTableModel.setValueAt(turnaroundTime, i, 6);
+                }
+            }
+        });
+
+        SJFpreemitive.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                // Get quantum from user input
+                String quantumString = JOptionPane.showInputDialog("Enter Quantum:");
+                if (quantumString == null || quantumString.isEmpty()) {
+                    return; // Exit
+//                    the action if the user cancels or enters an empty string
+                }
+
+                int quantum;
+                try {
+                    quantum = Integer.parseInt(quantumString);
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(null, "Invalid Quantum Entered");
+                    return;
+                }
+
+                // SJF Preemptive Scheduling Algorithm
+                int currentTime = 0;
+
+                // Create a list to hold the remaining processes
+                List<Integer> remainingProcesses = new ArrayList<>();
+                for (int i = 0; i < schedulingTableModel.getRowCount(); i++) {
+                    remainingProcesses.add(i);
+                }
+
+                while (!remainingProcesses.isEmpty()) {
+                    int nextProcess = -1;
+                    int shortestBurst = Integer.MAX_VALUE;
+
+                    // Find the process with the shortest burst time that has arrived
+                    for (int i : remainingProcesses) {
+                        int arrivalTime = (int) schedulingTableModel.getValueAt(i, 1);
+                        int burstTime = (int) schedulingTableModel.getValueAt(i, 2);
+
+                        if (arrivalTime <= currentTime && burstTime < shortestBurst) {
+                            nextProcess = i;
+                            shortestBurst = burstTime;
+                        }
+                    }
+
+                    // If a process is found, execute it
+                    if (nextProcess != -1) {
+                        int burstTime = (int) schedulingTableModel.getValueAt(nextProcess, 2);
+
+                        // Determine whether to execute the full burst or a portion based on the quantum
+                        int executionTime = Math.min(burstTime, quantum);
+
+                        // Update completion time, turnaround time, and waiting time
+                        int completionTime = currentTime + executionTime;
+                        int turnaroundTime = completionTime - (int) schedulingTableModel.getValueAt(nextProcess, 1);
+                        int waitingTime = turnaroundTime - executionTime;
+
+                        schedulingTableModel.setValueAt(completionTime, nextProcess, 4);
+                        schedulingTableModel.setValueAt(waitingTime, nextProcess, 5);
+                        schedulingTableModel.setValueAt(turnaroundTime, nextProcess, 6);
+
+                        // Move to the next time
+                        currentTime += executionTime;
+
+                        // Update the remaining burst time for the process
+                        burstTime -= executionTime;
+                        schedulingTableModel.setValueAt(burstTime, nextProcess, 2);
+
+                        // If the process has remaining burst time, add it back to the list
+                        if (burstTime > 0) {
+                            remainingProcesses.add(nextProcess);
+                        } else {
+                            // Remove the process from the remaining processes if it has completed
+                            remainingProcesses.remove((Integer) nextProcess);
+                        }
+                    } else {
+                        // Find the next arrival time among the processes not yet in remainingProcesses
+                        // and move currentTime to that time
+                        int nextArrivalTime = Integer.MAX_VALUE;
+                        for (int i = 0; i < schedulingTableModel.getRowCount(); i++) {
+                            if (!remainingProcesses.contains(i)) {
+                                int arrivalTime = (int) schedulingTableModel.getValueAt(i, 1);
+                                if (arrivalTime > currentTime && arrivalTime < nextArrivalTime) {
+                                    nextArrivalTime = arrivalTime;
+                                }
+                            }
+                        }
+                        currentTime = nextArrivalTime != Integer.MAX_VALUE ? nextArrivalTime : currentTime + 1;
+                    }
                 }
             }
         });
